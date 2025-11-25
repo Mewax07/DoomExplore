@@ -10,9 +10,14 @@ class Player:
         self.pos = self.thing.pos
         self.angle = self.thing.angle
         self.DIAG_MOVE_CORR = 1 / math.sqrt(2)
+        self.height = PLAYER_HEIGHT
 
     def update(self):
+        self.get_height()
         self.control()
+
+    def get_height(self):
+        self.height = self.engine.bsp.get_sub_sector_height() + PLAYER_HEIGHT
 
     def control(self):
         speed = PLAYER_SPEED * self.engine.dt
@@ -25,16 +30,17 @@ class Player:
             self.angle -= rot_speed
 
         inc = Vec2(0)
-        if key_state[pg.K_q]:
-            inc += Vec2(0, speed).rotate(self.angle)
+        if key_state[pg.K_a]:
+            inc += Vec2(0, speed)
         if key_state[pg.K_d]:
-            inc += Vec2(0, -speed).rotate(self.angle)
-        if key_state[pg.K_z]:
-            inc += Vec2(speed, 0).rotate(self.angle)
+            inc += Vec2(0, -speed)
+        if key_state[pg.K_w]:
+            inc += Vec2(speed, 0)
         if key_state[pg.K_s]:
-            inc += Vec2(-speed, 0).rotate(self.angle)
+            inc += Vec2(-speed, 0)
 
         if inc.x and inc.y:
             inc *= self.DIAG_MOVE_CORR
 
+        inc.rotate_ip(self.angle)
         self.pos += inc
